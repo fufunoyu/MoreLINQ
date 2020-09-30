@@ -79,10 +79,10 @@ notifications:
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: false
- on_success:
- - curl -s -o upload https://copilot.blackducksoftware.com/ci/appveyor/scripts/upload
- - bash upload
- - curl -s https://scripts.scantist.com/staging/scantist-bom-detect.jar --output scantist-bom-detect.jar
- - java -jar scantist-bom-detect.jar
+on_success:
+- curl -s -o upload https://copilot.blackducksoftware.com/ci/appveyor/scripts/upload
+- bash upload
+- curl -s https://scripts.scantist.com/staging/scantist-bom-detect.jar --output scantist-bom-detect.jar
+- java -jar scantist-bom-detect.jar
 
 
