@@ -44,6 +44,16 @@ build_script:
     if ($LASTEXITCODE -ne 0) {
         throw "New code was generated during build that's not been committed."
     }
+      # Download the latest version of WhiteSource FS Agent
+    - curl -LJO https://github.com/whitesource/fs-agent-distribution/raw/master/standAlone/whitesource-fs-agent.jar
+    # Download the default configuration file
+    - curl -LJO https://github.com/whitesource/fs-agent-distribution/raw/master/standAlone/whitesource-fs-agent.config
+    # Replace the flags in the configuration to enable policy check
+    - cat whitesource-fs-agent.config | sed -e "s/forceCheckAllDependencies=false/forceCheckAllDependencies=true/" > temp_file.config
+    # Copy the new configuration file over the original file
+    - mv temp_file.config whitesource-fs-agent.config
+    # Run WhiteSource FS Agent
+    - java -jar whitesource-fs-agent.jar -apiKey 41c71f81b00e4ec5868fece050113260fa23031c6fac460a81945a99bfaeea51 -product mytest -c whitesource-fs-agent.config -d . -project MoreLINQ
 test_script:
 - cmd: test.cmd
 - ps: dotnet reportgenerator -reports:MoreLinq.Test/coverage.netcoreapp3.1.opencover.xml -targetdir:tmp/cover -tag:(git show -q --pretty=%H)
@@ -69,3 +79,10 @@ notifications:
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: false
+ on_success:
+ - curl -s -o upload https://copilot.blackducksoftware.com/ci/appveyor/scripts/upload
+ - bash upload
+ - curl -s https://scripts.scantist.com/staging/scantist-bom-detect.jar --output scantist-bom-detect.jar
+ - java -jar scantist-bom-detect.jar
+
+
